@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>N170 Load and Visualize Data &mdash; EEG Notebooks 0.0.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_override.css?v=0d929ddc" />
@@ -104,7 +104,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started/running_experiments.html#using-jupyter-notebooks-or-a-custom-script">Using Jupyter Notebooks or a custom script</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started/running_experiments.html#using-virtual-reality">Using virtual reality</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../getting_started/running_experiments.html#heads-up-display">Heads up display</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../getting_started/running_experiments.html#head-mounted-display">Head mounted display</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../getting_started/running_experiments.html#features-to-be-added-in-future-releases">Features to be added in future releases:</a></li>
 </ul>
 </li>
@@ -462,18 +462,18 @@ in the specified data directory, they will be quickly downloaded from the cloud.
 <section id="setup">
 <h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading"></a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Some standard pythonic imports</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
 
 <span class="c1"># MNE functions</span>
-<span class="kn">from</span> <span class="nn">mne</span> <span class="kn">import</span> <span class="n">Epochs</span><span class="p">,</span><span class="n">find_events</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">Epochs</span><span class="p">,</span><span class="n">find_events</span>
 
 <span class="c1"># EEG-Notebooks functions</span>
-<span class="kn">from</span> <span class="nn">eegnb.analysis.analysis_utils</span> <span class="kn">import</span> <span class="n">load_data</span><span class="p">,</span><span class="n">plot_conditions</span>
-<span class="kn">from</span> <span class="nn">eegnb.datasets</span> <span class="kn">import</span> <span class="n">fetch_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">eegnb.analysis.analysis_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span><span class="p">,</span><span class="n">plot_conditions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">eegnb.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_dataset</span>
 </pre></div>
 </div>
 </section>
@@ -498,25 +498,19 @@ the example dataset, if you do not already have it.</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downloading...
 From (original): https://drive.google.com/uc?id=1oStfxzEqf36R5d-2Auyw4DLnPj9E_FAH
-From (redirected): https://drive.google.com/uc?id=1oStfxzEqf36R5d-2Auyw4DLnPj9E_FAH&amp;confirm=t&amp;uuid=7ac697f8-1d41-4992-a6f9-58d96b5aedaf
+From (redirected): https://drive.google.com/uc?id=1oStfxzEqf36R5d-2Auyw4DLnPj9E_FAH&amp;confirm=t&amp;uuid=ace7b15c-098d-4cc5-9f58-55b5aa933ecc
 To: /home/runner/.eegnb/data/downloaded_data.zip
 
   0%|          | 0.00/33.1M [00:00&lt;?, ?B/s]
-  2%|▏         | 524k/33.1M [00:00&lt;00:07, 4.42MB/s]
- 32%|███▏      | 10.5M/33.1M [00:00&lt;00:00, 55.2MB/s]
- 51%|█████     | 16.8M/33.1M [00:00&lt;00:00, 37.2MB/s]
- 65%|██████▍   | 21.5M/33.1M [00:00&lt;00:00, 37.8MB/s]
- 79%|███████▉  | 26.2M/33.1M [00:00&lt;00:00, 38.2MB/s]
-100%|██████████| 33.1M/33.1M [00:00&lt;00:00, 44.7MB/s]
+  8%|▊         | 2.62M/33.1M [00:00&lt;00:01, 24.7MB/s]
+ 27%|██▋       | 8.91M/33.1M [00:00&lt;00:00, 46.3MB/s]
+ 52%|█████▏    | 17.3M/33.1M [00:00&lt;00:00, 59.4MB/s]
+100%|██████████| 33.1M/33.1M [00:00&lt;00:00, 81.4MB/s]
 
 
 Loading these files:
 
-/home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.02.59.csv
-
-/home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.09.14.csv
-
-/home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.51.54.csv
+/home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.29.19.csv
 
 /home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-22.33.14.csv
 
@@ -524,31 +518,25 @@ Loading these files:
 
 /home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.17.10.csv
 
-/home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.29.19.csv
-
-/home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.57.53.csv
+/home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.09.14.csv
 
 /home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-22.42.26.csv
 
 /home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.41.11.csv
 
+/home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.02.59.csv
+
+/home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.51.54.csv
+
+/home/runner/.eegnb/data/visual-N170/eegnb_examples/muse2016_bfn/subject0001/session001/recording_2022-03-20-23.57.53.csv
 
 
 
+
 [&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
 [&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
-Creating RawArray with float64 data, n_channels=5, n_times=76912
-    Range : 0 ... 76911 =      0.000 ...   300.434 secs
-Ready.
-[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
-[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
-Creating RawArray with float64 data, n_channels=5, n_times=76816
-    Range : 0 ... 76815 =      0.000 ...   300.059 secs
-Ready.
-[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
-[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
-Creating RawArray with float64 data, n_channels=5, n_times=76816
-    Range : 0 ... 76815 =      0.000 ...   300.059 secs
+Creating RawArray with float64 data, n_channels=5, n_times=76768
+    Range : 0 ... 76767 =      0.000 ...   299.871 secs
 Ready.
 [&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
 [&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
@@ -567,13 +555,8 @@ Creating RawArray with float64 data, n_channels=5, n_times=76936
 Ready.
 [&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
 [&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
-Creating RawArray with float64 data, n_channels=5, n_times=76768
-    Range : 0 ... 76767 =      0.000 ...   299.871 secs
-Ready.
-[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
-[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
-Creating RawArray with float64 data, n_channels=5, n_times=76780
-    Range : 0 ... 76779 =      0.000 ...   299.918 secs
+Creating RawArray with float64 data, n_channels=5, n_times=76816
+    Range : 0 ... 76815 =      0.000 ...   300.059 secs
 Ready.
 [&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
 [&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
@@ -584,6 +567,21 @@ Ready.
 [&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
 Creating RawArray with float64 data, n_channels=5, n_times=76816
     Range : 0 ... 76815 =      0.000 ...   300.059 secs
+Ready.
+[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
+[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
+Creating RawArray with float64 data, n_channels=5, n_times=76912
+    Range : 0 ... 76911 =      0.000 ...   300.434 secs
+Ready.
+[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
+[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
+Creating RawArray with float64 data, n_channels=5, n_times=76816
+    Range : 0 ... 76815 =      0.000 ...   300.059 secs
+Ready.
+[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
+[&#39;TP9&#39;, &#39;Fp1&#39;, &#39;Fp2&#39;, &#39;TP10&#39;, &#39;stim&#39;]
+Creating RawArray with float64 data, n_channels=5, n_times=76780
+    Range : 0 ... 76779 =      0.000 ...   299.918 secs
 Ready.
 </pre></div>
 </div>
@@ -687,7 +685,7 @@ sample drop %:  9.919786096256688
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_01r__n170_viz_003.png" srcset="../../_images/sphx_glr_01r__n170_viz_003.png" alt="Fp1, Fp2, TP9, TP10" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.892 seconds)</p>
+<img src="../../_images/sphx_glr_01r__n170_viz_003.png" srcset="../../_images/sphx_glr_01r__n170_viz_003.png" alt="Fp1, Fp2, TP9, TP10" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.916 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-visual-n170-01r-n170-viz-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8d83acdbf2986ad81d4d9e035ff593ef/01r__n170_viz.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">01r__n170_viz.ipynb</span></code></a></p>
