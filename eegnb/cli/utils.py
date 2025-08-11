@@ -13,7 +13,7 @@ from eegnb.experiments import VisualSSVEP
 from eegnb.experiments import AuditoryOddball
 from eegnb.experiments.visual_cueing import cueing
 from eegnb.experiments.visual_codeprose import codeprose
-from eegnb.experiments.visual_eyeclosure import baseline as eyeclosure_baseline
+from eegnb.experiments import VisualEyeClosureBaseline
 from eegnb.experiments.auditory_oddball import diaconescu
 from eegnb.experiments.auditory_ssaep import ssaep, ssaep_onefreq
 from typing import Optional
@@ -26,7 +26,7 @@ experiments = {
     "visual-SSVEP": VisualSSVEP(),
     "visual-cue": cueing,
     "visual-codeprose": codeprose,
-    "visual-eyeclosure-baseline": eyeclosure_baseline,
+    "visual-eyeclosure-baseline": VisualEyeClosureBaseline(),
     "auditory-SSAEP orig": ssaep,
     "auditory-SSAEP onefreq": ssaep_onefreq,
     "auditory-oddball orig": AuditoryOddball(),
@@ -49,7 +49,7 @@ def run_experiment(
         module = experiments[experiment]
 
         # Condition added for different run types of old and new experiment class structure
-        if experiment == "visual-N170" or experiment == "visual-P300" or experiment == "visual-SSVEP" or experiment == "auditory-oddball orig":
+        if experiment == "visual-N170" or experiment == "visual-P300" or experiment == "visual-SSVEP" or experiment == "auditory-oddball orig" or experiment == "visual-eyeclosure-baseline":
             module.duration = record_duration
             module.eeg = eeg_device
             module.save_fn = save_fn

@@ -1,136 +1,141 @@
-"""Eyes-open/eyes-closed baseline task.
-
-Alternates blocks of eyes-open and eyes-closed rest. A fixation cross is
-presented during eyes-open blocks and a "close your eyes" message is
-shown during eyes-closed blocks. At each transition a short tone (or an
-optional audio file) is played, and LSL/serial markers are sent so EEG
-and fNIRS systems receive synchronized events.
-"""
+"""Eyes-open/eyes-closed baseline experiment using the BaseExperiment API."""
 
 from typing import Optional
 from time import time
 
 from psychopy import prefs
+
 prefs.hardware["audioLib"] = "PTB"
 prefs.hardware["audioLatencyMode"] = 3
 
-from psychopy import core, visual, sound
-from pylsl import StreamInfo, StreamOutlet, local_clock
+from psychopy import sound, visual
+from pylsl import StreamInfo, StreamOutlet
 
 try:  # pyserial is optional
     import serial
 except Exception:  # pragma: no cover - handled gracefully
     serial = None
 
+import numpy as np
+from pandas import DataFrame
+
 from eegnb.devices.eeg import EEG
+from eegnb.experiments import Experiment
 
-__title__ = "Visual Eye Closure Baseline"
 
+class VisualEyeClosureBaseline(Experiment.BaseExperiment):
+    """Baseline alternating eyes-open and eyes-closed blocks."""
 
-def present(
-    duration: Optional[float] = None,
-    eeg: Optional[EEG] = None,
-    save_fn: Optional[str] = None,
-    block_duration: float = 60.0,
-    n_cycles: int = 5,
-    serial_port: Optional[str] = None,
-    use_verbal_cues: bool = False,
-    open_audio: Optional[str] = None,
-    close_audio: Optional[str] = None,
-    **kwargs,
-) -> None:
-    """Run the eye-closure baseline experiment.
+    __title__ = "Visual Eye Closure Baseline"
 
-    Parameters
-    ----------
-    duration : float, optional
-        Total duration of the recording in seconds. If provided, overrides
-        ``n_cycles`` by computing the number of block cycles that fit in the
-        requested duration.
-    eeg : EEG, optional
-        EEG device instance. If provided, markers are sent via ``eeg.push_sample``
-        in addition to LSL and the recording is started/stopped automatically.
-    save_fn : str, optional
-        Path for saving recorded EEG data.
-    block_duration : float
-        Duration of each eyes-open or eyes-closed block in seconds.
-    n_cycles : int
-        Number of open/closed cycles. Each cycle consists of one open and one
-        closed block. Ignored if ``duration`` is provided.
-    serial_port : str, optional
-        Serial port to which trigger bytes should be sent. If ``None`` no serial
-        triggers are emitted.
-    use_verbal_cues : bool
-        If ``True`` and ``open_audio``/``close_audio`` are supplied, verbal cues
-        are played instead of tones.
-    open_audio, close_audio : str, optional
-        Paths to audio files for the "open your eyes" and "close your eyes"
-        instructions. Used only when ``use_verbal_cues`` is ``True``.
-    """
+    def __init__(
+        self,
+        duration: Optional[float] = None,
+        eeg: Optional[EEG] = None,
+        save_fn: Optional[str] = None,
+        block_duration: float = 60.0,
+        n_cycles: int = 5,
+        serial_port: Optional[str] = None,
+        use_verbal_cues: bool = False,
+        open_audio: Optional[str] = None,
+        close_audio: Optional[str] = None,
+    ):
+        exp_name = "Visual Eye Closure Baseline"
+        if duration is None:
+            duration = block_duration * 2 * n_cycles
+        self.block_duration = block_duration
+        self.n_cycles = n_cycles
+        self.serial_port = serial_port
+        self.use_verbal_cues = use_verbal_cues
+        self.open_audio = open_audio
+        self.close_audio = close_audio
+        self.serial = None
+        self.outlet = None
+        self.open_sound = None
+        self.close_sound = None
+        super().__init__(
+            exp_name,
+            duration,
+            eeg,
+            save_fn,
+            n_trials=2 * n_cycles,
+            iti=0,
+            soa=block_duration,
+            jitter=0,
+        )
 
-    if duration is not None:
-        # Each cycle has two blocks
-        n_cycles = max(1, int(duration // (2 * block_duration)))
+    def load_stimulus(self):
+        self.fixation = visual.TextStim(win=self.window, text="+", height=1.0)
+        self.close_text = visual.TextStim(win=self.window, text="Close your eyes", height=1.0)
+        return [self.fixation, self.close_text]
 
-    # Setup LSL outlet
-    info = StreamInfo("Markers", "Markers", 1, 0, "int32", "eyeclosure-baseline")
-    outlet = StreamOutlet(info)
+    def setup(self, instructions: bool = True):
+        # recompute number of trials if duration was changed after init
+        self.n_cycles = max(1, int(self.duration // (2 * self.block_duration)))
+        self.n_trials = self.n_cycles * 2
+        super().setup(instructions)
 
-    # Setup serial connection if requested
-    ser = None
-    if serial_port and serial is not None:
+        # overwrite trial sequence to alternate between open (0) and closed (1)
+        parameter = np.tile([0, 1], self.n_cycles)
+        self.trials = DataFrame(
+            dict(parameter=parameter, timestamp=np.zeros(self.n_trials))
+        )
+
+        # LSL outlet for markers
+        info = StreamInfo("Markers", "Markers", 1, 0, "int32", "eyeclosure-baseline")
+        self.outlet = StreamOutlet(info)
+
+        # serial connection for hardware triggers
+        if self.serial_port and serial is not None:
+            try:
+                self.serial = serial.Serial(self.serial_port, 115200, timeout=1)
+            except Exception:  # pragma: no cover
+                self.serial = None
+
+        # sounds for block transitions
+        if self.use_verbal_cues and self.open_audio and self.close_audio:
+            self.open_sound = sound.Sound(self.open_audio)
+            self.close_sound = sound.Sound(self.close_audio)
+        else:
+            self.open_sound = sound.Sound(440, secs=0.2)
+            self.close_sound = sound.Sound(330, secs=0.2)
+
+    def present_stimulus(self, idx: int):
+        label = self.trials["parameter"].iloc[idx]  # 0 open, 1 closed
+        if self.trials["timestamp"].iloc[idx] == 0:
+            timestamp = time()
+            self.trials.at[idx, "timestamp"] = timestamp
+            self.outlet.push_sample([self.markernames[label]], timestamp)
+            if self.eeg:
+                marker = (
+                    [self.markernames[label]]
+                    if self.eeg.backend == "muselsl"
+                    else self.markernames[label]
+                )
+                self.eeg.push_sample(marker=marker, timestamp=timestamp)
+            if self.serial:
+                try:
+                    self.serial.write(bytes([self.markernames[label]]))
+                except Exception:  # pragma: no cover
+                    pass
+            if label == 0:
+                self.open_sound.play()
+            else:
+                self.close_sound.play()
+
+        if label == 0:
+            self.fixation.draw()
+        else:
+            self.close_text.draw()
+        self.window.flip()
+
+    def run(self, instructions: bool = True):
         try:
-            ser = serial.Serial(serial_port, 115200, timeout=1)
-        except Exception as exc:  # pragma: no cover
-            print(f"Could not open serial port {serial_port}: {exc}")
-            ser = None
+            super().run(instructions)
+        finally:
+            if self.serial:
+                self.serial.close()
 
-    # Prepare window and stimuli
-    win = visual.Window([800, 600], monitor="testMonitor", units="deg", fullscr=True)
-    win.mouseVisible = False
-    fixation = visual.TextStim(win, text="+", height=1.0)
-    close_text = visual.TextStim(win, text="Close your eyes", height=1.0)
 
-    # Load sounds
-    if use_verbal_cues and open_audio and close_audio:
-        open_sound = sound.Sound(open_audio)
-        close_sound = sound.Sound(close_audio)
-    else:
-        open_sound = sound.Sound(440, secs=0.2)
-        close_sound = sound.Sound(330, secs=0.2)
+__title__ = VisualEyeClosureBaseline.__title__
 
-    # Start EEG recording if available
-    if eeg:
-        eeg.start_recording(save_fn=save_fn, duration=block_duration * 2 * n_cycles)
-
-    try:
-        for _ in range(n_cycles):
-            # Eyes-open block
-            ts = local_clock()
-            outlet.push_sample([1], ts)
-            if eeg:
-                eeg.push_sample(marker=[1], timestamp=time())
-            if ser:
-                ser.write(b"\x01")
-            open_sound.play()
-            fixation.draw()
-            win.flip()
-            core.wait(block_duration)
-
-            # Eyes-closed block
-            ts = local_clock()
-            outlet.push_sample([2], ts)
-            if eeg:
-                eeg.push_sample(marker=[2], timestamp=time())
-            if ser:
-                ser.write(b"\x02")
-            close_sound.play()
-            close_text.draw()
-            win.flip()
-            core.wait(block_duration)
-    finally:
-        win.close()
-        if eeg:
-            eeg.stop_recording()
-        if ser:
-            ser.close()
