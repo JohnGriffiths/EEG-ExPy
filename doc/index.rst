@@ -21,6 +21,7 @@
    experiments/vssvep
    experiments/cueing
    experiments/gonogo
+   experiments/visual_eyeclosure
    experiments/all_examples
 
 

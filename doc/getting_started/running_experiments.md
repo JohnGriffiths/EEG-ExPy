@@ -49,6 +49,7 @@ Please select which experiment you would like to run:
 [6] Auditory SSAEP (single freq)
 [7] Auditory oddball (orig)
 [8] Auditory oddball (diaconescu)
+[9] Visual Eye Closure Baseline
 
 Enter Experiment Selection:
 ```

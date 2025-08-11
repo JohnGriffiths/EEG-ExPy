@@ -13,6 +13,7 @@ from eegnb.experiments import VisualSSVEP
 from eegnb.experiments import AuditoryOddball
 from eegnb.experiments.visual_cueing import cueing
 from eegnb.experiments.visual_codeprose import codeprose
+from eegnb.experiments.visual_eyeclosure import baseline as eyeclosure_baseline
 from eegnb.experiments.auditory_oddball import diaconescu
 from eegnb.experiments.auditory_ssaep import ssaep, ssaep_onefreq
 from typing import Optional
@@ -25,6 +26,7 @@ experiments = {
     "visual-SSVEP": VisualSSVEP(),
     "visual-cue": cueing,
     "visual-codeprose": codeprose,
+    "visual-eyeclosure-baseline": eyeclosure_baseline,
     "auditory-SSAEP orig": ssaep,
     "auditory-SSAEP onefreq": ssaep_onefreq,
     "auditory-oddball orig": AuditoryOddball(),
