@@ -1,0 +1,14 @@
+muselsl>=2.0.2
+pylsl==1.16.2
+brainflow>=4.8.2
+pysocks>=1.7.1
+pyserial>=3.5
+h5py>=3.1.0
+pytest-shutil
+pyo>=1.0.3; platform_system == "Linux"
+pyobjc==7.3; sys_platform == 'darwin'
+pynput
+airium>=0.1.0
+attrdict>=2.0.1
+attrdict3
+click

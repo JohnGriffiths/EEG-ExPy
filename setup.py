@@ -5,25 +5,24 @@ from setuptools import setup, find_packages
 with open("README.rst", "r") as fh:
     long_description = fh.read()
 
-def filter_requirements(requirements_list):
-    """Filter out invalid requirement specifiers"""
-    filtered = []
-    for req in requirements_list:
+
+def read_requirements(filename):
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+    reqs = []
+    for req in lines:
         req = req.strip()
-        # Skip empty lines, comments, and editable installs
         if req and not req.startswith('#') and not req.startswith('-e'):
-            # Remove inline comments
             if '#' in req:
                 req = req.split('#')[0].strip()
-            if req:  # Make sure it's still not empty after removing inline comments
-                filtered.append(req)
-    return filtered
+            if req:
+                reqs.append(req)
+    return reqs
 
-fptxt = open('requirements.txt', 'r').read()
-install_requires_analysis = filter_requirements(fptxt.split('## ~~ Analysis Requirements ~~')[1].split('## ~~')[0].splitlines()[1:])
-install_requires_streaming = filter_requirements(fptxt.split('## ~~ Streaming Requirements ~~')[1].split('## ~~')[0].splitlines()[1:])
-install_requires_stimpres = filter_requirements(fptxt.split('## ~~ Stimpres Requirements ~~')[1].split('## ~~')[0].splitlines()[1:])
-install_requires_docsbuild = filter_requirements(fptxt.split('## ~~ Docsbuild Requirements ~~')[1].split('## ~~')[0].splitlines()[1:])
+install_requires_analysis = read_requirements('requirements-analysis.txt')
+install_requires_streaming = read_requirements('requirements-streaming.txt')
+install_requires_stimpres = read_requirements('requirements-stimpres.txt')
+install_requires_docsbuild = read_requirements('requirements-docsbuild.txt')
 
 setup(
     name="eeg-expy", 
